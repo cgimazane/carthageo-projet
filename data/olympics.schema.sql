@@ -7,7 +7,6 @@
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -66,7 +65,6 @@ ALTER TABLE public.athlete OWNER TO postgres;
 --
 
 CREATE SEQUENCE public.athlete_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -105,7 +103,6 @@ ALTER TABLE public.country OWNER TO postgres;
 --
 
 CREATE SEQUENCE public.country_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -141,7 +138,6 @@ ALTER TABLE public.event OWNER TO postgres;
 --
 
 CREATE SEQUENCE public.event_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -192,7 +188,6 @@ ALTER TABLE public.olympiad OWNER TO postgres;
 --
 
 CREATE SEQUENCE public.olympiad_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
