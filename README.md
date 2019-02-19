@@ -3,20 +3,20 @@ Sujet et données du projet Carthagéo 2019
 
 https://www.overleaf.com/project/5c0567725c83d47ac7deb176
 
-# Création de la base...
+## Création de la base
 
-## ... En utilisant le SGBD pgAdmin
-* Ouvrir le SGBD
+### Par le SGBD pgAdmin
 * Se connecter à localhost
-* Créer une base olympics
-  * ```CREATE DATABASE olympics;```
+* Créer une base *olympics*
+  + `CREATE DATABASE olympics;`
 * Ouvrir la base olympics
-  * Executer le fichier SQL ```olympics.schema.sql```
-  * Executer le fichier SQL ```olympics.data.sql```
+  + Executer le fichier SQL `olympics.schema.sql`
+  + Executer le fichier SQL `olympics.data.sql`
 
-## ... ou en ligne de commande
+### En ligne de commande
 
-method en ligne de commande pour executer les fichiers SQL (user postgres)
+* Ouvrir un terminal
+* Lancer les commandes suivantes
 
 ```bash
 psql -U postgres -h localhost -d postgres -c "CREATE DATABASE olympics;"
