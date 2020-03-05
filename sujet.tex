@@ -5,7 +5,8 @@
 \usepackage[a4paper, total={6in, 10in}]{geometry}
 \usepackage{graphicx}
 \usepackage[english]{babel}
-
+\usepackage{minted}
+\usemintedstyle{borland}
 
 \usepackage[svgnames]{xcolor}
 
@@ -13,7 +14,7 @@
 
 \title{Jeux Olympiques, médailles dans le temps}
 \author{Master CarthaGéo}
-\date{Mars 2019}
+\date{Mars 2020}
 
 \begin{document}
 
@@ -67,6 +68,8 @@ La base de données repose sur des données récupérées librement sur Internet
 
 \subsubsection{Descriptif rapide de la base de données}
 
+{\footnotesize NB : En gras, les clés étrangères}
+
 \begin{itemize}
 
 \item
@@ -85,7 +88,7 @@ Une table \textit{event} contenant les épreuves pour lesquelles des médailles 
 {\footnotesize Découpage effectué par le CIO}
 
 \item
-Une table \underline{géométrique} \textit{country} répertoriant les pays/délégations participants aux Jeux Olympiques avec
+Une table \underline{géométrique} \textit{country} répertoriant les pays/délégations participants aux Jeux Olympiques avec :
 
 \begin{itemize}
 
@@ -95,9 +98,9 @@ Une table \underline{géométrique} \textit{country} répertoriant les pays/dél
 
 \item sa population \textit{pop}
 
-\item sa première particiaption aux JO \textit{first\_participation}
+\item sa première participation aux JO \textit{first\_participation}
 
-\item sa dernière particiaption aux JO \textit{last\_participation}
+\item sa dernière participation aux JO \textit{last\_participation}
 
 \item sa géométrie \textit{geometry} {\footnotesize (type : MultiPolygon, projection : 4326, dimension : 2) }
 
@@ -106,7 +109,7 @@ Une table \underline{géométrique} \textit{country} répertoriant les pays/dél
 {\footnotesize NB : Certaines délégations ont été représentées géographiquement de façon fictive : IOP, ZZX}
 
 \item
-Une table \textit{olympiad} listant toutes les olympiades pendant lesquelles des médailles ont été décernées
+Une table \textit{olympiad} listant toutes les olympiades pendant lesquelles des médailles ont été décernées :
 
 \begin{itemize}
 
@@ -121,7 +124,7 @@ Une table \textit{olympiad} listant toutes les olympiades pendant lesquelles des
 \end{itemize}
 
 \item
-Une table \textit{athlete} recensant tous les athlètes médaillés dans une olympiade avec
+Une table \textit{athlete} recensant tous les athlètes médaillés dans une olympiade avec :
 
 \begin{itemize}
 
@@ -251,7 +254,77 @@ Une fois la base de données chargée, il est fortement conseillé de s'amuser u
 
 \item Ne pas abuser du copier/coller
 
-\item Demander de l'aide en cas de blocage
+\item Demander de l'aide en cas de blocage problématique
+
+\end{itemize}
+
+\newpage
+
+\section{Annexes}
+
+\begin{itemize}
+
+\item Les 10 athlètes avec le plus de médailles pour un pays donné
+\begin{minted}{sql}
+SELECT athlete.id, athlete.name, count(medal.medal) AS medalcount
+FROM athlete
+    JOIN medal ON athlete.id = medal.athlete_id
+WHERE athlete.country_id = 40
+GROUP BY athlete.id
+ORDER BY medalcount DESC
+LIMIT 10;
+\end{minted}
+
+{\footnotesize Le pays est le Chili (id=40)}
+
+\item Les athlètes, leur(s) médailles, leur(s) disciplines qui ont gagné une médaille "à domicile"
+\begin{minted}{sql}
+SELECT athlete.name, medal.medal, event.name
+FROM medal
+    JOIN athlete ON medal.athlete_id = athlete.id
+    JOIN olympiad ON medal.olympiad_id = olympiad.id
+    JOIN event ON medal.event_id = event.id
+WHERE athlete.country_id = olympiad.country_id;
+\end{minted}
+
+\item Les pays qui gagnent le plus de médailles d'or pour un sport donné
+\begin{minted}{sql}
+SELECT count(medal.medal) as medalcount, country.name, country.geometry
+FROM medal
+    JOIN athlete ON medal.athlete_id = athlete.id
+    JOIN country ON athlete.country_id = country.id
+WHERE
+    medal.event_id = 56
+AND medal.medal = 'Gold'
+GROUP BY country.id
+ORDER BY medalcount DESC, country.first_participation ASC;
+\end{minted}
+
+{\footnotesize L'épreuve est le saut en longueur [sans distinction de sexe] (id=56)}
+
+\item La performance des nouveaux pays pour leur première particiaption
+\begin{minted}{sql}
+SELECT c.name, c.first_participation, count(m.*) as medalcount FROM country c
+    JOIN athlete a ON a.country_id = c.id
+    JOIN medal m ON m.athlete_id = a.id
+    JOIN olympiad o ON o.id = m.olympiad_id
+WHERE o.year = c.first_participation
+GROUP BY c.name, c.first_participation
+ORDER BY c.first_participation, c.name;
+\end{minted}
+
+\item Les pays triés par "densité" de médailles
+\begin{minted}{sql}
+SELECT id, code, name, total, medalcount.total/ST_AREA(country.geometry) AS density
+FROM (
+    SELECT athlete.country_id, count(medal.*) AS total
+    FROM medal
+    JOIN athlete ON medal.athlete_id = athlete.id
+    GROUP BY athlete.country_id
+    ) AS medalcount
+JOIN country ON medalcount.country_id = country.id
+ORDER by density
+\end{minted}
 
 \end{itemize}
 
