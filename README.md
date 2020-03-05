@@ -1,5 +1,5 @@
 # carthageo-projet
-Sujet et données du projet Carthagéo 2019
+Sujet et données du projet Carthagéo 2020
 
 ## Création de la base
 
